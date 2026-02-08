@@ -1,0 +1,394 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 19,
+  "summary": "Build a private, secure notes/files app with explicit sharing, plus a paywall/monetization layer so only paid users can store/upload content (the canister still pays cycles under the reverse-gas model).",
+  "architectural_notes": [
+    "Use strong encryption and explicit access control/permissions so only authorized users can access uploaded notes/files.",
+    "Add file metadata (e.g., display name and description) to the canister data model and expose authorized update APIs restricted to the file owner.",
+    "Mainnet deployment requires a funded cycles wallet/canister; ensure sufficient cycles are available before attempting `dfx deploy --network ic`.",
+    "ICP uses a reverse-gas model: the app canister pays cycles for compute/storage; implement monetization as an application-level paywall (subscription/credits) rather than direct user-paid cycles.",
+    "Implement payment verification and entitlement tracking per user principal (e.g., accept payments via ckBTC/ckICP flows and mark principals as active/paid before allowing uploads).",
+    "Admin access-management UI requires a backend query to list all principals with access plus associated metadata (plan label/expiration) and aggregated per-principal storage usage (sum of stored file sizes).",
+    "Storage/files are stored in this app’s canister(s); under ICP’s reverse-gas model the canister owner/app pays cycles for storage (not end users), so per-principal usage tracking is needed for admin oversight/monetization.",
+    "File preview UX decision: clicking a file should open a dedicated full preview view that replaces the existing file detail panel; non-previewable types show a fallback message instead of triggering download automatically.",
+    "Video preview should use standard HTML5 progressive playback; ensure the backend download/streaming approach supports efficient incremental fetching for large media (avoid requiring full-file download before playback)."
+  ],
+  "known_issues": [
+    "Mainnet deployment can fail if the cycles wallet/canister is not funded with sufficient cycles (top up via NNS by converting ICP to cycles).",
+    "Settings area UI is not scrollable, preventing access to the Admin Paywall Management panel input (cannot enter Principal ID).",
+    "App is stuck on \"Loading Secure Vault\" immediately on open (startup hang / infinite loading state)."
+  ],
+  "isFixRequest": false,
+  "existing_features": [
+    {
+      "id": "feature-implement-user-authentication-using-internet-identity-and-ensure-all-data-operations-are-scoped-to-the-caller-s-internet-computer-principal",
+      "title": "Implement user authentication using Internet Identity and ensure all data operations are scoped to the caller’s Internet Computer principal.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-backend-data-models-and-apis-to-create-list-read-update-and-delete-private-notes-owned-by-the-caller-with-strict-authorization-checks-enforced-in-the-motoko-canister",
+      "title": "Add backend data models and APIs to create, list, read, update, and delete private notes owned by the caller, with strict authorization checks enforced in the Motoko canister.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-file-upload-and-download-support-with-secure-storage-in-the-canister-including-chunked-upload-to-handle-larger-files-and-strict-authorization-checks-on-every-chunk-write-and-on-downloads",
+      "title": "Add file upload and download support with secure storage in the canister, including chunked upload to handle larger files, and strict authorization checks on every chunk/write and on downloads.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-explicit-access-sharing-controls-for-both-notes-and-files-owners-can-grant-and-revoke-access-to-specific-internet-computer-principals-and-the-ui-provides-a-clear-share-management-screen-per-item",
+      "title": "Implement explicit access sharing controls for both notes and files: owners can grant and revoke access to specific Internet Computer principals, and the UI provides a clear share management screen per item.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-optional-client-side-encryption-for-notes-and-files-before-upload-using-the-browser-s-webcrypto-api-so-the-canister-stores-ciphertext-implement-per-user-encryption-keys-and-encrypt-per-item-keys-for-each-explicitly-authorized-recipient",
+      "title": "Add optional client-side encryption for notes and files before upload using the browser’s WebCrypto API so the canister stores ciphertext; implement per-user encryption keys and encrypt per-item keys for each explicitly authorized recipient.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-coherent-non-blue-non-purple-visual-theme-for-a-secure-vault-product-typography-spacing-and-component-styling-and-apply-it-consistently-across-the-app-auth-lists-detail-views-upload-sharing",
+      "title": "Create a coherent, non-blue/non-purple visual theme for a “secure vault” product (typography, spacing, and component styling) and apply it consistently across the app (auth, lists, detail views, upload, sharing).",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-frontend-ui-for-file-owners-to-rename-an-uploaded-file-and-edit-its-description-from-the-file-detail-panel-including-save-cancel-interactions-and-error-handling",
+      "title": "Add frontend UI for file owners to rename an uploaded file and edit its description from the file detail panel, including save/cancel interactions and error handling.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-data-fetching-mutations-react-query-hooks-to-support-file-metadata-updates-and-to-ensure-relevant-queries-are-invalidated-refetched-after-a-rename-description-edit",
+      "title": "Update frontend data fetching/mutations (React Query hooks) to support file metadata updates and to ensure relevant queries are invalidated/refetched after a rename/description edit.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-files-list-ui-to-display-the-current-file-name-post-rename-and-optionally-show-a-short-preview-of-the-description-when-present-without-cluttering-the-layout",
+      "title": "Update the Files list UI to display the current file name (post-rename) and optionally show a short preview of the description when present, without cluttering the layout.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-mainnet-deployment-guide-that-documents-the-exact-steps-to-publish-this-app-to-the-icp-mainnet-including-prerequisites-dfx-install-cycles-wallet-setup-build-commands-deploying-canisters-to-ic-and-how-to-obtain-the-resulting-canister-ids-and-frontend-url",
+      "title": "Add a mainnet deployment guide that documents the exact steps to publish this app to the ICP mainnet, including prerequisites (dfx install, cycles/wallet setup), build commands, deploying canisters to `ic`, and how to obtain the resulting canister IDs and frontend URL.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-ensure-the-frontend-production-configuration-for-internet-identity-is-explicitly-documented-and-validated-so-that-mainnet-deployments-use-the-correct-internet-identity-provider-and-derivation-origin-settings",
+      "title": "Ensure the frontend production configuration for Internet Identity is explicitly documented and validated so that mainnet deployments use the correct Internet Identity provider and derivation origin settings.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-release-checklist-for-publishing-that-covers-deploying-backend-frontend-canisters-verifying-authorization-boundaries-owner-only-metadata-edits-sharing-and-confirming-encrypted-content-behavior-on-mainnet",
+      "title": "Add a release checklist for publishing that covers: deploying backend + frontend canisters, verifying authorization boundaries (owner-only metadata edits, sharing), and confirming encrypted content behavior on mainnet.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-retry-publishing-the-existing-backend-frontend-canisters-to-the-internet-computer-mainnet-now-that-the-user-has-funded-a-cycles-wallet-3-7t-cycles-and-complete-the-full-build-deploy-flow-against-the-ic-network",
+      "title": "Retry publishing the existing backend + frontend canisters to the Internet Computer mainnet now that the user has funded a cycles wallet (3.7T cycles), and complete the full build + deploy flow against the `ic` network.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-frontend-data-hooks-react-query-for-1-fetching-the-caller-s-paywall-access-status-and-2-calling-the-admin-paywall-management-mutations-including-appropriate-query-invalidation-so-the-ui-updates-immediately-after-changes",
+      "title": "Add frontend data hooks (React Query) for (1) fetching the caller’s paywall/access status and (2) calling the admin paywall management mutations, including appropriate query invalidation so the UI updates immediately after changes.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-an-in-vault-paywall-ui-that-appears-for-authenticated-users-who-do-not-have-storage-access-clearly-explaining-that-payment-is-required-to-enable-uploads-storage-and-preventing-access-to-storage-features-in-the-existing-vault-ui-especially-the-upload-tab",
+      "title": "Implement an in-vault paywall UI that appears for authenticated users who do not have storage access, clearly explaining that payment is required to enable uploads/storage and preventing access to storage features in the existing Vault UI (especially the Upload tab).",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-simple-admin-management-ui-inside-the-existing-vault-settings-area-to-grant-revoke-paywall-access-for-a-specified-principal-text-input-intended-for-manual-payment-reconciliation-no-on-chain-verification-and-show-the-current-caller-s-access-status-in-the-ui",
+      "title": "Add a simple admin management UI inside the existing vault settings area to grant/revoke paywall access for a specified Principal (text input), intended for manual payment reconciliation (no on-chain verification), and show the current caller’s access status in the UI.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-make-the-settings-drawer-the-sheet-opened-via-the-settings-icon-vertically-scrollable-so-users-can-always-reach-and-interact-with-the-admin-paywall-management-principal-id-input-and-action-buttons-even-on-small-screens-or-when-the-on-screen-keyboard-is-open",
+      "title": "Make the Settings drawer (the Sheet opened via the Settings icon) vertically scrollable so users can always reach and interact with the Admin Paywall Management principal ID input and action buttons, even on small screens or when the on-screen keyboard is open.",
+      "reqIds": [
+        "REQ-24"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-adjust-the-settings-sheet-layout-to-avoid-nested-non-functional-scroll-containers-e-g-a-fixed-height-sheet-body-with-an-inner-non-scrolling-content-area-ensuring-a-single-reliable-scroll-region-for-the-settings-content",
+      "title": "Adjust the Settings sheet layout to avoid nested/non-functional scroll containers (e.g., a fixed-height sheet body with an inner non-scrolling content area), ensuring a single, reliable scroll region for the settings content.",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-eliminate-the-infinite-loading-secure-vault-startup-hang-by-ensuring-the-app-can-exit-the-loading-state-even-if-backend-actor-initialization-or-initial-profile-fetching-does-not-complete-e-g-initialization-call-never-resolves",
+      "title": "Eliminate the infinite \"Loading secure vault...\" startup hang by ensuring the app can exit the loading state even if backend actor initialization or initial profile fetching does not complete (e.g., initialization call never resolves).",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-non-immutable-actor-hook-do-not-modify-the-existing-immutable-frontend-src-hooks-useactor-ts-that-creates-the-backend-actor-with-a-timeout-and-robust-error-handling-and-exposes-actor-isfetching-error-so-downstream-queries-can-avoid-waiting-forever",
+      "title": "Add a new non-immutable actor hook (do not modify the existing immutable `frontend/src/hooks/useActor.ts`) that creates the backend actor with a timeout and robust error handling, and exposes `{ actor, isFetching, error }` so downstream queries can avoid waiting forever.",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-refactor-frontend-react-query-hooks-to-use-the-new-safe-timeout-actor-hook-so-that-profile-paywall-notes-files-queries-do-not-block-the-entire-app-when-actor-initialization-is-stuck",
+      "title": "Refactor frontend React Query hooks to use the new safe/timeout actor hook so that profile/paywall/notes/files queries do not block the entire app when actor initialization is stuck.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-app-tsx-to-surface-initialization-errors-and-provide-a-retry-path-rather-than-showing-the-loading-spinner-indefinitely-when-authenticated-but-unable-to-load-the-vault-due-to-actor-profile-bootstrap-issues",
+      "title": "Update `frontend/src/App.tsx` to surface initialization errors and provide a retry path, rather than showing the loading spinner indefinitely when authenticated but unable to load the vault due to actor/profile bootstrap issues.",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-admin-only-full-page-screen-in-the-vault-ui-that-lists-all-principals-returned-by-the-new-backend-paywall-access-list-api-showing-per-principal-principal-id-total-storage-used-plan-label-and-expiration-date-with-a-per-row-revoke-action",
+      "title": "Create a new admin-only full-page screen in the Vault UI that lists all principals returned by the new backend paywall-access list API, showing per-principal: Principal ID, total storage used, plan label, and expiration date, with a per-row revoke action.",
+      "reqIds": [
+        "REQ-31"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-vault-ui-navigation-to-reach-the-new-admin-only-principals-access-list-screen-via-a-link-button-placed-within-the-existing-admin-controls-area-paywall-admin-controls",
+      "title": "Add Vault UI navigation to reach the new admin-only principals access list screen via a link/button placed within the existing admin controls area (Paywall admin controls).",
+      "reqIds": [
+        "REQ-32"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-extend-frontend-react-query-hooks-to-support-fetching-the-admin-paywall-access-list-and-invalidating-refetching-it-after-an-admin-revokes-a-principal-s-access",
+      "title": "Extend frontend React Query hooks to support fetching the admin paywall-access list and invalidating/refetching it after an admin revokes a principal’s access.",
+      "reqIds": [
+        "REQ-33"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-full-preview-view-for-a-selected-file-that-replaces-the-current-file-detail-panel-in-the-files-tab-so-users-can-preview-common-file-formats-in-browser-before-downloading",
+      "title": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+      "reqIds": [
+        "REQ-34"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-in-browser-previews-for-images-and-pdfs-on-the-new-file-preview-view-using-decrypted-file-bytes-when-encryption-is-enabled-without-changing-the-backend-apis",
+      "title": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
+      "reqIds": [
+        "REQ-35"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enable-standard-in-browser-video-playback-for-video-files-on-the-preview-page-using-the-html5-video-element",
+      "title": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-for-non-previewable-file-types-show-a-fallback-message-on-the-preview-page-instead-of-downloading-automatically-and-still-provide-a-manual-download-button",
+      "title": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
+      "reqIds": [
+        "REQ-37"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-files-tab-wiring-so-selecting-a-file-opens-the-new-preview-view-and-preserve-existing-file-actions-download-and-for-owners-share-delete-and-metadata-edit-in-a-way-that-is-accessible-from-the-preview-view",
+      "title": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Securely upload and store notes/files with access restricted to explicitly authorized users",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Allow users to rename previously uploaded files (owner-only, with authorization checks)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Support adding and editing a description/metadata field for uploaded files (owner-only, with authorization checks)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Extend the backend file data model to store editable file metadata, including (a) a display name that can be changed after upload and (b) a free-text description field, while preserving file content, encryption metadata, and sharing lists.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Add backend APIs that allow only the file owner to update a file’s display name and description after upload, with strict authorization checks and clear error messages when a non-owner attempts updates.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Update backend list/get file responses to include the new description field (and updated display name) so the frontend can render and edit the metadata consistently across the file list and file detail views.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "If changing the backend’s file identifier strategy is required to support renaming (because the current file id is derived from the name), implement a safe state migration so existing uploaded files remain accessible and keep their current names as the initial display name.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Publish the app to the ICP mainnet (prepare and provide mainnet deployment steps/process)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Add a paywall so only users who have paid (e.g., via ICP/ckICP or BTC/ckBTC) can access storage/upload features; track payment status per Internet Identity principal and gate uploads/UI accordingly",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Add backend paywall state tracked per Internet Identity principal, including a query API to return the caller’s current payment/access status and metadata needed by the UI (e.g., whether storage is enabled, optional plan label, and optional expiration timestamp).",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-11",
+      "summary": "Enforce the paywall in the backend by blocking storage-changing operations for unpaid users: at minimum, prevent creating new notes and uploading files when the caller does not have storage access; return clear, user-facing English error messages when blocked.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Add backend admin-only APIs to manage paywall access for principals (e.g., grant access, revoke access, and optionally set/clear an expiration timestamp and plan label), with strict authorization checks consistent with the app’s existing admin model.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Add an admin-only full-page Vault UI screen that lists all principals with paywall/storage access, shows per-principal metadata (plan label, expiration date) and total storage used, and supports revoke access with automatic list refresh",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add a new admin-only backend query API that returns the full list of principals tracked in the paywall system, including each principal’s paywall metadata (hasPaid, planLabel, paidUntil) and the total storage used (sum of file sizes) for files owned by that principal.",
+      "reqIds": [
+        "REQ-30"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add a full file preview page that replaces the current file detail panel when a user clicks a file (instead of forcing download)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Support in-browser previews for common formats: images and PDFs (render in preview page)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Enable standard in-browser video streaming on the preview page using the HTML5 video element for video files",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-18",
+      "summary": "For non-previewable file types (e.g., ZIP), show a fallback message on the preview page rather than auto-downloading",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "Private notes & file vault with explicit access sharing",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

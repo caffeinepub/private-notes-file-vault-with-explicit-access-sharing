@@ -1,2 +1,3 @@
-# private-notes-file-vault-with-explicit-access-sharing
-Exported from Caffeine project: Private notes &amp; file vault with explicit access sharing
+## 
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

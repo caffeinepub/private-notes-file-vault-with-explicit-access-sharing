@@ -1,0 +1,87 @@
+{
+  "kind": "coverage_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-08T23:52:57.150Z",
+  "sources": {
+    "buildRequest": true,
+    "implementationPlan": true
+  },
+  "requirements": {
+    "total": 5,
+    "implemented": 5,
+    "items": [
+      {
+        "id": "REQ-34",
+        "summary": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-35",
+        "summary": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx",
+          "frontend/src/utils/filePreview.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx",
+          "frontend/src/utils/filePreview.ts"
+        ]
+      },
+      {
+        "id": "REQ-36",
+        "summary": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-37",
+        "summary": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-38",
+        "summary": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/layout/VaultLayout.tsx",
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/layout/VaultLayout.tsx",
+          "frontend/src/components/files/FilePreviewPanel.tsx"
+        ]
+      }
+    ]
+  },
+  "changedFiles": [
+    "build-request.json",
+    "feature_evidence.json",
+    "frontend-file-summaries.txt",
+    "frontend-implementation-plan.json",
+    "frontend/src/components/files/FilePreviewPanel.tsx",
+    "frontend/src/components/layout/VaultLayout.tsx",
+    "frontend/src/utils/filePreview.ts",
+    "project_state.json",
+    "scratch/component-selection.json",
+    "spec.md",
+    "spec_vs_diff_report.json"
+  ]
+}

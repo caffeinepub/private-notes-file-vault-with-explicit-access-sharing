@@ -1,0 +1,136 @@
+{
+  "kind": "build_request",
+  "title": "Add full-page in-app file preview (images, PDFs, video) with fallback for unsupported types",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-34",
+      "text": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-7",
+          "msg-8"
+        ],
+        "quotes": [
+          "a full preview page would be good. If it's a video, can it stream?",
+          "1. it can replace the current detail panel. ",
+          "3. show a fallback message on the preview page instead of downloading automatically."
+        ]
+      },
+      "acceptanceCriteria": [
+        "When a user selects a file in the Files list, the right-hand panel shows a preview-focused page instead of the current 'Click the download button' placeholder UI.",
+        "The preview view has a clear way to return to the Files list/close the preview (e.g., Back button that clears the selected file).",
+        "The preview view does not automatically start a download for any file type."
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "text": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3",
+          "msg-4",
+          "msg-8"
+        ],
+        "quotes": [
+          "can I preview the files when I click on them prior to downloading them? at least for common files like an image, pdf or so.",
+          "a full preview page would be good. If it's a video, can it stream?",
+          "2. standard in-browser streaming."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Image files (e.g., png/jpg/gif/webp based on filename extension) render inline using an <img> (or equivalent) sourced from a Blob URL created from decrypted bytes.",
+        "PDF files (based on filename extension) render inline in the preview view (e.g., via an <iframe> using a Blob URL).",
+        "Preview rendering uses the existing decryption flow (see current download behavior in frontend/src/components/files/FileDetailPanel.tsx) so encrypted files preview correctly for authorized users.",
+        "Any Blob URLs created for preview are revoked/cleaned up when navigating away or switching files to prevent memory leaks.",
+        "If file bytes fail to load/decrypt, an in-panel error state is shown with an English error message and a retry action."
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "text": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7",
+          "msg-8"
+        ],
+        "quotes": [
+          "If it's a video, can it stream?",
+          "2. standard in-browser streaming."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Video files (based on filename extension such as mp4/webm/ogg/mov where supported) render a <video controls> player in the preview view.",
+        "Video playback uses a Blob URL created from decrypted bytes (same decryption expectations as other previews).",
+        "If the browser cannot play the detected video type, the preview view shows a clear fallback message instead of attempting to download."
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "text": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8"
+        ],
+        "quotes": [
+          "show a fallback message on the preview page instead of downloading automatically."
+        ]
+      },
+      "acceptanceCriteria": [
+        "For unsupported/unrecognized file extensions, the preview view shows an English message such as 'Preview not available for this file type.'",
+        "A Download button remains available on the preview view for all file types (including previewable and non-previewable).",
+        "No unsupported file type triggers an automatic download."
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "text": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7"
+        ],
+        "quotes": [
+          "it can replace the current detail panel."
+        ]
+      },
+      "acceptanceCriteria": [
+        "The Files tab right-hand panel uses the new preview view for selected files instead of rendering the existing FileDetailPanel preview placeholder section.",
+        "The preview view provides a Download action equivalent to the current download behavior in frontend/src/components/files/FileDetailPanel.tsx (including decrypt-before-save).",
+        "If the caller is the file owner, the preview view still exposes: Share, Delete, and Edit name/description capabilities (can reuse existing patterns/components; behavior must remain owner-only).",
+        "If the caller is not the file owner, owner-only controls are not shown, consistent with current behavior."
+      ]
+    }
+  ],
+  "constraints": [
+    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Keep the backend as a single Motoko actor; do not introduce additional backend services.",
+    "Do not add third-party realtime/streaming services or integrations; implement previews using existing canister file retrieval and browser capabilities.",
+    "Use English for all user-facing text."
+  ],
+  "nonGoals": [
+    "Implementing true progressive video streaming with HTTP range requests, byte-range seeking, or partial loading from the canister.",
+    "Adding thumbnail previews in the file list.",
+    "Automatically downloading any file type when the preview view is opened.",
+    "Changing the backend file storage format or adding new backend endpoints solely for preview."
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

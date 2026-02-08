@@ -1,0 +1,100 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Full-page in-app file preview for images, PDFs, and video with safe fallbacks",
+  "requirements": [
+    {
+      "id": "REQ-34",
+      "summary": "Add a new preview-focused view that replaces the Files tab detail panel and supports closing/back to the list without auto-downloading.",
+      "acceptanceCriteria": [
+        "When a user selects a file in the Files list, the right-hand panel shows a preview-focused page instead of the current 'Click the download button' placeholder UI.",
+        "The preview view has a clear way to return to the Files list/close the preview (e.g., Back button that clears the selected file).",
+        "The preview view does not automatically start a download for any file type."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/files/FilePreviewPanel.tsx",
+          "operation": "create",
+          "description": "Create a new preview-focused right-hand panel for Files tab selection, including a Back button (calls onClose to clear selection) and a dedicated preview area (no automatic downloads). Use existing shadcn-ui components (e.g., Button, Skeleton, AlertDialog, Input/Textarea where needed) for consistent layout; verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "summary": "Implement image and PDF inline previews on the new preview view using decrypted bytes and Blob URLs, with cleanup and error+retry states.",
+      "acceptanceCriteria": [
+        "Image files (e.g., png/jpg/gif/webp based on filename extension) render inline using an <img> (or equivalent) sourced from a Blob URL created from decrypted bytes.",
+        "PDF files (based on filename extension) render inline in the preview view (e.g., via an <iframe> using a Blob URL).",
+        "Preview rendering uses the existing decryption flow (see current download behavior in frontend/src/components/files/FileDetailPanel.tsx) so encrypted files preview correctly for authorized users.",
+        "Any Blob URLs created for preview are revoked/cleaned up when navigating away or switching files to prevent memory leaks.",
+        "If file bytes fail to load/decrypt, an in-panel error state is shown with an English error message and a retry action."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/files/FilePreviewPanel.tsx",
+          "operation": "modify",
+          "description": "Implement preview loading for images and PDFs: detect by filename extension, load bytes via the existing blob-storage ExternalBlob getBytes() capability, decrypt using useEncryptionSettings().decryptFileBytes, create a typed Blob + Blob URL, render inline (<img> for images, <iframe> for PDFs). Add in-panel error state with English copy and Retry action to re-attempt loading. Ensure Blob URLs are revoked on unmount and when switching selected files to prevent leaks. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/utils/filePreview.ts",
+          "operation": "create",
+          "description": "Add small frontend helpers for determining preview type and MIME type from filename extension (image/pdf/video/unknown) to keep FilePreviewPanel focused and reduce duplication. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "summary": "Enable HTML5 video playback in the preview view using decrypted bytes and Blob URLs, with a clear fallback when unsupported.",
+      "acceptanceCriteria": [
+        "Video files (based on filename extension such as mp4/webm/ogg/mov where supported) render a <video controls> player in the preview view.",
+        "Video playback uses a Blob URL created from decrypted bytes (same decryption expectations as other previews).",
+        "If the browser cannot play the detected video type, the preview view shows a clear fallback message instead of attempting to download."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/files/FilePreviewPanel.tsx",
+          "operation": "modify",
+          "description": "Add video preview support: for video extensions, create a decrypted-bytes Blob URL and render an HTML5 <video controls> player. Use canPlayType checks based on derived MIME to decide whether to render the player; if not playable, show an English fallback message and do not attempt any automatic download. Ensure the same Blob URL cleanup behavior as other previews. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "summary": "Show a non-previewable fallback message for unsupported types while keeping a manual Download button available for all files.",
+      "acceptanceCriteria": [
+        "For unsupported/unrecognized file extensions, the preview view shows an English message such as 'Preview not available for this file type.'",
+        "A Download button remains available on the preview view for all file types (including previewable and non-previewable).",
+        "No unsupported file type triggers an automatic download."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/files/FilePreviewPanel.tsx",
+          "operation": "modify",
+          "description": "Implement unsupported-type UX: when file type is not recognized/previewable (or when video is unplayable), render a clear English 'Preview not available for this file type.' message and keep a manual Download button visible. Ensure the component never initiates a download automatically for any type. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "summary": "Wire the Files tab to open the new preview view on selection and preserve download + owner-only share/delete/metadata edit actions from the preview view.",
+      "acceptanceCriteria": [
+        "The Files tab right-hand panel uses the new preview view for selected files instead of rendering the existing FileDetailPanel preview placeholder section.",
+        "The preview view provides a Download action equivalent to the current download behavior in frontend/src/components/files/FileDetailPanel.tsx (including decrypt-before-save).",
+        "If the caller is the file owner, the preview view still exposes: Share, Delete, and Edit name/description capabilities (can reuse existing patterns/components; behavior must remain owner-only).",
+        "If the caller is not the file owner, owner-only controls are not shown, consistent with current behavior."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/layout/VaultLayout.tsx",
+          "operation": "modify",
+          "description": "Update the Files tab detail-pane wiring to render FilePreviewPanel (instead of FileDetailPanel) and pass selected file id plus an onClose that clears the selected file. Ensure navigation/back behavior is accessible from the preview view. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/files/FilePreviewPanel.tsx",
+          "operation": "modify",
+          "description": "Preserve and expose existing file actions in the preview view: implement manual Download with the same decrypt-before-save flow as FileDetailPanel; show Share/Delete/Edit name+description only when the caller is the owner (same owner check as current); reuse ShareManagerDialog for sharing and existing confirmation dialog pattern for delete; keep non-owner UI consistent (no owner-only controls). Verify the component's usage instructions before implementing."
+        }
+      ]
+    }
+  ]
+}

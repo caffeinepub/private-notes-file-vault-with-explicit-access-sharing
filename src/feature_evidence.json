@@ -1,0 +1,107 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-add-a-new-full-preview-view-for-a-selected-file-that-replaces-the-current-file-detail-panel-in-the-files-tab-so-users-can-preview-common-file-formats-in-browser-before-downloading",
+      "featureTitle": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+      "files": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-34"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-in-browser-previews-for-images-and-pdfs-on-the-new-file-preview-view-using-decrypted-file-bytes-when-encryption-is-enabled-without-changing-the-backend-apis",
+      "featureTitle": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
+      "files": [
+        "frontend/src/components/files/FilePreviewPanel.tsx",
+        "frontend/src/utils/filePreview.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-35"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-enable-standard-in-browser-video-playback-for-video-files-on-the-preview-page-using-the-html5-video-element",
+      "featureTitle": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
+      "files": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-36"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-for-non-previewable-file-types-show-a-fallback-message-on-the-preview-page-instead-of-downloading-automatically-and-still-provide-a-manual-download-button",
+      "featureTitle": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
+      "files": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-37"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-files-tab-wiring-so-selecting-a-file-opens-the-new-preview-view-and-preserve-existing-file-actions-download-and-for-owners-share-delete-and-metadata-edit-in-a-way-that-is-accessible-from-the-preview-view",
+      "featureTitle": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
+      "files": [
+        "frontend/src/components/files/FilePreviewPanel.tsx",
+        "frontend/src/components/layout/VaultLayout.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-38"
+      ],
+      "confidence": "high"
+    }
+  ]
+}

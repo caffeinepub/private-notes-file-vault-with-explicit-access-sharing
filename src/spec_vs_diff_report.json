@@ -1,0 +1,83 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-08T23:52:57.146Z",
+  "summary": "Diff adds a new FilePreviewPanel component and filePreview utilities, and updates VaultLayout to use FilePreviewPanel in the Files tab. The preview loading/decryption and Blob URL creation/cleanup are partially evidenced, but several acceptance-criteria UI behaviors (rendering elements, back/close behavior, retry/error UI, owner-only actions wiring) are not verifiable from the truncated diff.",
+  "missing_requirements": [
+    {
+      "id": "REQ-34",
+      "requirement": "Preview view has a clear way to return to the Files list/close the preview (e.g., Back button that clears the selected file).",
+      "reason": "FilePreviewPanel accepts an onClose prop, but the diff excerpt does not show any rendered Back/Close control wired to onClose, and VaultLayout snippet is truncated before showing selection/close wiring.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx",
+        "frontend/src/components/layout/VaultLayout.tsx"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "requirement": "Image files render inline using an <img> (or equivalent) sourced from a Blob URL created from decrypted bytes.",
+      "reason": "The diff shows Blob URL creation using decrypted bytes, but does not show any JSX rendering (<img>) for image previews due to truncation.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "requirement": "PDF files render inline in the preview view (e.g., via an <iframe> using a Blob URL).",
+      "reason": "The diff shows determining preview type and creating a Blob URL, but does not show any JSX rendering (<iframe>/<embed>) for PDFs due to truncation.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-35",
+      "requirement": "If file bytes fail to load/decrypt, show an in-panel error state with an English error message and a retry action.",
+      "reason": "The effect sets previewError (e.g., 'Failed to load preview'), but the diff excerpt does not show an error UI or any retry control/handler.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-36",
+      "requirement": "Video files render a <video controls> player using a Blob URL created from decrypted bytes, and if the browser cannot play the type show a fallback message (no download).",
+      "reason": "Utilities include canPlayVideo() and video mime mappings, and FilePreviewPanel creates Blob URLs, but the diff does not show any <video> rendering, canPlayVideo usage, or the fallback message behavior due to truncation.",
+      "evidence": [
+        "frontend/src/utils/filePreview.ts",
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-37",
+      "requirement": "For unsupported/unrecognized file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
+      "reason": "The loader returns early when previewType is 'unsupported', but the diff excerpt does not show the fallback message UI, nor does it confirm the Download button is always present for all types (UI portion truncated).",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "requirement": "Preview view provides a Download action equivalent to current FileDetailPanel download behavior (including decrypt-before-save).",
+      "reason": "handleDownload begins by fetching bytes and decrypting and creating a Blob URL, but the rest of the download/save flow is truncated, so equivalence to existing decrypt-before-save behavior cannot be confirmed from provided text.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    },
+    {
+      "id": "REQ-38",
+      "requirement": "If caller is the file owner, preview view still exposes Share, Delete, and Edit name/description capabilities; if not owner, owner-only controls hidden.",
+      "reason": "FilePreviewPanel imports ShareManagerDialog, delete/update hooks, and editing state, but the diff excerpt does not show rendered controls nor conditional owner-only gating based on principal/file owner due to truncation.",
+      "evidence": [
+        "frontend/src/components/files/FilePreviewPanel.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.56,
+  "changed_files": [
+    "frontend-file-summaries.txt",
+    "frontend/src/components/files/FilePreviewPanel.tsx",
+    "frontend/src/components/layout/VaultLayout.tsx",
+    "frontend/src/utils/filePreview.ts",
+    "project_state.json"
+  ]
+}

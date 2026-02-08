@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --radius: 0.375rem;
+        /* Secure vault theme - charcoal/stone with green accents */
+        --background: 0.98 0.005 120;
+        --foreground: 0.25 0.015 120;
+        --card: 0.96 0.005 120;
+        --card-foreground: 0.25 0.015 120;
+        --popover: 0.98 0.005 120;
+        --popover-foreground: 0.25 0.015 120;
+        --primary: 0.55 0.15 152;
+        --primary-foreground: 0.98 0.005 120;
+        --secondary: 0.88 0.01 120;
+        --secondary-foreground: 0.25 0.015 120;
+        --muted: 0.92 0.008 120;
+        --muted-foreground: 0.50 0.012 120;
+        --accent: 0.70 0.18 142;
+        --accent-foreground: 0.98 0.005 120;
+        --destructive: 0.55 0.22 25;
+        --destructive-foreground: 0.98 0.005 120;
+        --border: 0.88 0.01 120;
+        --input: 0.88 0.01 120;
+        --ring: 0.55 0.15 152;
+        --chart-1: 0.60 0.18 152;
+        --chart-2: 0.65 0.16 142;
+        --chart-3: 0.70 0.14 132;
+        --chart-4: 0.55 0.20 162;
+        --chart-5: 0.50 0.22 172;
+        --sidebar: 0.96 0.005 120;
+        --sidebar-foreground: 0.25 0.015 120;
+        --sidebar-primary: 0.55 0.15 152;
+        --sidebar-primary-foreground: 0.98 0.005 120;
+        --sidebar-accent: 0.92 0.008 120;
+        --sidebar-accent-foreground: 0.25 0.015 120;
+        --sidebar-border: 0.88 0.01 120;
+        --sidebar-ring: 0.55 0.15 152;
+    }
+
+    .dark {
+        --background: 0.18 0.015 120;
+        --foreground: 0.95 0.005 120;
+        --card: 0.22 0.015 120;
+        --card-foreground: 0.95 0.005 120;
+        --popover: 0.20 0.015 120;
+        --popover-foreground: 0.95 0.005 120;
+        --primary: 0.65 0.18 152;
+        --primary-foreground: 0.15 0.015 120;
+        --secondary: 0.28 0.015 120;
+        --secondary-foreground: 0.95 0.005 120;
+        --muted: 0.30 0.015 120;
+        --muted-foreground: 0.65 0.010 120;
+        --accent: 0.70 0.20 142;
+        --accent-foreground: 0.15 0.015 120;
+        --destructive: 0.60 0.24 25;
+        --destructive-foreground: 0.95 0.005 120;
+        --border: 0.30 0.015 120;
+        --input: 0.30 0.015 120;
+        --ring: 0.65 0.18 152;
+        --chart-1: 0.65 0.20 152;
+        --chart-2: 0.70 0.18 142;
+        --chart-3: 0.75 0.16 132;
+        --chart-4: 0.60 0.22 162;
+        --chart-5: 0.55 0.24 172;
+        --sidebar: 0.20 0.015 120;
+        --sidebar-foreground: 0.95 0.005 120;
+        --sidebar-primary: 0.65 0.18 152;
+        --sidebar-primary-foreground: 0.15 0.015 120;
+        --sidebar-accent: 0.28 0.015 120;
+        --sidebar-accent-foreground: 0.95 0.005 120;
+        --sidebar-border: 0.30 0.015 120;
+        --sidebar-ring: 0.65 0.18 152;
+    }
+
+    * {
+        @apply border-border;
+    }
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+}
+
