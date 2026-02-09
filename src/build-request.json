@@ -1,123 +1,79 @@
 {
   "kind": "build_request",
-  "title": "Add full-page in-app file preview (images, PDFs, video) with fallback for unsupported types",
-  "priority": "normal",
+  "title": "Fresh IC mainnet backend deployment flow + reliable canister ID output and verification",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-34",
-      "text": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+      "id": "REQ-39",
+      "text": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-12",
+          "msg-13"
+        ],
+        "quotes": [
+          "yes lets do a fresh backend deploy",
+          "ready"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Running `frontend/scripts/deploy-ic.sh` on a clean mainnet setup (no canisters created yet) creates required canisters on `--network ic` and then installs them successfully, or exits with a clear error message indicating which step failed (create/build/install) and why.",
+        "The script no longer relies solely on `dfx canister install ...` for first-time deployment; it performs the necessary canister creation step(s) when the canister does not yet exist on mainnet.",
+        "The script continues to write a timestamped log file under `frontend/deploy-logs/` and includes the failing step name and captured `dfx` output on failure."
+      ]
+    },
+    {
+      "id": "REQ-40",
+      "text": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-10",
+          "msg-12"
+        ],
+        "quotes": [
+          "what is the canister id this has been installed in? I would like to monitor and top up with cycles",
+          "yes lets do a fresh backend deploy"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On success, the script prints and logs: `Backend Canister ID: ...` and `Frontend Canister ID: ...` (as it does today) and additionally prints a short ‘Verify’ section containing at least: `dfx canister status backend --network ic` and a backend reachability hint (e.g., an ic0.app/raw.ic0.app URL pattern) without requiring the user to guess what to check.",
+        "The printed IDs are retrieved from `dfx` in a way that reflects the actual deployed canisters on `--network ic` (not local), and the output is present in the log file as well as stdout."
+      ]
+    },
+    {
+      "id": "REQ-41",
+      "text": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-4",
           "msg-7",
-          "msg-8"
+          "msg-12"
         ],
         "quotes": [
-          "a full preview page would be good. If it's a video, can it stream?",
-          "1. it can replace the current detail panel. ",
-          "3. show a fallback message on the preview page instead of downloading automatically."
+          "when I link it - it says Sorry, the canister \"34x5e-hyaaa-aaaad-qjcoq-cai\" was not found",
+          "Reject text: Canister 34x5e-hyaaa-aaaad-qjcoq-cai is stopped",
+          "yes lets do a fresh backend deploy"
         ]
       },
       "acceptanceCriteria": [
-        "When a user selects a file in the Files list, the right-hand panel shows a preview-focused page instead of the current 'Click the download button' placeholder UI.",
-        "The preview view has a clear way to return to the Files list/close the preview (e.g., Back button that clears the selected file).",
-        "The preview view does not automatically start a download for any file type."
-      ]
-    },
-    {
-      "id": "REQ-35",
-      "text": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-3",
-          "msg-4",
-          "msg-8"
-        ],
-        "quotes": [
-          "can I preview the files when I click on them prior to downloading them? at least for common files like an image, pdf or so.",
-          "a full preview page would be good. If it's a video, can it stream?",
-          "2. standard in-browser streaming."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Image files (e.g., png/jpg/gif/webp based on filename extension) render inline using an <img> (or equivalent) sourced from a Blob URL created from decrypted bytes.",
-        "PDF files (based on filename extension) render inline in the preview view (e.g., via an <iframe> using a Blob URL).",
-        "Preview rendering uses the existing decryption flow (see current download behavior in frontend/src/components/files/FileDetailPanel.tsx) so encrypted files preview correctly for authorized users.",
-        "Any Blob URLs created for preview are revoked/cleaned up when navigating away or switching files to prevent memory leaks.",
-        "If file bytes fail to load/decrypt, an in-panel error state is shown with an English error message and a retry action."
-      ]
-    },
-    {
-      "id": "REQ-36",
-      "text": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-7",
-          "msg-8"
-        ],
-        "quotes": [
-          "If it's a video, can it stream?",
-          "2. standard in-browser streaming."
-        ]
-      },
-      "acceptanceCriteria": [
-        "Video files (based on filename extension such as mp4/webm/ogg/mov where supported) render a <video controls> player in the preview view.",
-        "Video playback uses a Blob URL created from decrypted bytes (same decryption expectations as other previews).",
-        "If the browser cannot play the detected video type, the preview view shows a clear fallback message instead of attempting to download."
-      ]
-    },
-    {
-      "id": "REQ-37",
-      "text": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "show a fallback message on the preview page instead of downloading automatically."
-        ]
-      },
-      "acceptanceCriteria": [
-        "For unsupported/unrecognized file extensions, the preview view shows an English message such as 'Preview not available for this file type.'",
-        "A Download button remains available on the preview view for all file types (including previewable and non-previewable).",
-        "No unsupported file type triggers an automatic download."
-      ]
-    },
-    {
-      "id": "REQ-38",
-      "text": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-7"
-        ],
-        "quotes": [
-          "it can replace the current detail panel."
-        ]
-      },
-      "acceptanceCriteria": [
-        "The Files tab right-hand panel uses the new preview view for selected files instead of rendering the existing FileDetailPanel preview placeholder section.",
-        "The preview view provides a Download action equivalent to the current download behavior in frontend/src/components/files/FileDetailPanel.tsx (including decrypt-before-save).",
-        "If the caller is the file owner, the preview view still exposes: Share, Delete, and Edit name/description capabilities (can reuse existing patterns/components; behavior must remain owner-only).",
-        "If the caller is not the file owner, owner-only controls are not shown, consistent with current behavior."
+        "`frontend/DEPLOYMENT_IC.md` includes the exact command(s) to run from the project root to deploy to `--network ic` (including invoking `frontend/scripts/deploy-ic.sh`).",
+        "The guide documents how to obtain and record the backend and frontend canister IDs after deployment, and how to verify them using `dfx` commands.",
+        "The troubleshooting section explicitly addresses: (1) NNS ‘canister not found’ when linking an ID, and (2) IC0508 ‘canister is stopped’ errors in the app, and provides concrete verification steps to distinguish ‘not deployed’, ‘stopped’, and ‘wrong network’ cases."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Keep the backend as a single Motoko actor; do not introduce additional backend services.",
-    "Do not add third-party realtime/streaming services or integrations; implement previews using existing canister file retrieval and browser capabilities.",
-    "Use English for all user-facing text."
+    "Backend must remain a single Motoko actor with all logic in `backend/main.mo`; only add `backend/migration.mo` if a state upgrade requires it.",
+    "Do not modify any paths listed under `frontend.immutablePaths` in SYSTEM_CONTEXT (compose new code instead).",
+    "Use English for any user-facing text."
   ],
   "nonGoals": [
-    "Implementing true progressive video streaming with HTTP range requests, byte-range seeking, or partial loading from the canister.",
-    "Adding thumbnail previews in the file list.",
-    "Automatically downloading any file type when the preview view is opened.",
-    "Changing the backend file storage format or adding new backend endpoints solely for preview."
+    "Implementing NNS UI changes or any third-party monitoring integration for cycles.",
+    "Adding new application features unrelated to mainnet deployment reliability (e.g., new vault functionality, new paywall rules).",
+    "Guaranteeing canister appearance in NNS without manual linking (NNS behavior is outside app control)."
   ],
   "imageRequirements": {
     "required": [],

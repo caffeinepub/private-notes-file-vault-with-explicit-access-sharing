@@ -8,7 +8,7 @@ This document describes how to deploy your application to the Internet Computer 
 2. **dfx identity**: Your dfx identity must be configured and set as the controller of your cycles wallet.
 3. **Internet connection**: Stable connection required for uploading assets to mainnet.
 
-## Deployment Command
+## Quick Start
 
-Run the deployment script from the project root:
+Run the deployment script from the **project root**:
 

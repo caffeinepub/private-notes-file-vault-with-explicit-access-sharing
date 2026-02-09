@@ -1,84 +1,58 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-08T23:52:57.150Z",
+  "generatedAt": "2026-02-09T00:25:09.491Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 5,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-34",
-        "summary": "Add a new full preview view for a selected file that replaces the current file detail panel in the Files tab, so users can preview common file formats in-browser before downloading.",
+        "id": "REQ-39",
+        "summary": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
+          "frontend/scripts/deploy-ic.sh"
         ],
         "matchedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
+          "frontend/scripts/deploy-ic.sh"
         ]
       },
       {
-        "id": "REQ-35",
-        "summary": "Implement in-browser previews for images and PDFs on the new file preview view using decrypted file bytes when encryption is enabled, without changing the backend APIs.",
+        "id": "REQ-40",
+        "summary": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx",
-          "frontend/src/utils/filePreview.ts"
+          "frontend/scripts/deploy-ic.sh"
         ],
         "matchedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx",
-          "frontend/src/utils/filePreview.ts"
+          "frontend/scripts/deploy-ic.sh"
         ]
       },
       {
-        "id": "REQ-36",
-        "summary": "Enable standard in-browser video playback for video files on the preview page using the HTML5 <video> element.",
+        "id": "REQ-41",
+        "summary": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
+          "frontend/DEPLOYMENT_IC.md"
         ],
         "matchedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
-        ]
-      },
-      {
-        "id": "REQ-37",
-        "summary": "For non-previewable file types, show a fallback message on the preview page instead of downloading automatically, and still provide a manual Download button.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/files/FilePreviewPanel.tsx"
-        ]
-      },
-      {
-        "id": "REQ-38",
-        "summary": "Update the Files tab wiring so selecting a file opens the new preview view, and preserve existing file actions (download; and for owners: share, delete, and metadata edit) in a way that is accessible from the preview view.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/layout/VaultLayout.tsx",
-          "frontend/src/components/files/FilePreviewPanel.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/layout/VaultLayout.tsx",
-          "frontend/src/components/files/FilePreviewPanel.tsx"
+          "frontend/DEPLOYMENT_IC.md"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/files/FilePreviewPanel.tsx",
-    "frontend/src/components/layout/VaultLayout.tsx",
-    "frontend/src/utils/filePreview.ts",
+    "frontend/DEPLOYMENT_IC.md",
+    "frontend/scripts/deploy-ic.sh",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

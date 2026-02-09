@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 19,
+  "projectStateVersion": 21,
   "summary": "Build a private, secure notes/files app with explicit sharing, plus a paywall/monetization layer so only paid users can store/upload content (the canister still pays cycles under the reverse-gas model).",
   "architectural_notes": [
     "Use strong encryption and explicit access control/permissions so only authorized users can access uploaded notes/files.",
@@ -11,14 +11,16 @@
     "Admin access-management UI requires a backend query to list all principals with access plus associated metadata (plan label/expiration) and aggregated per-principal storage usage (sum of stored file sizes).",
     "Storage/files are stored in this app’s canister(s); under ICP’s reverse-gas model the canister owner/app pays cycles for storage (not end users), so per-principal usage tracking is needed for admin oversight/monetization.",
     "File preview UX decision: clicking a file should open a dedicated full preview view that replaces the existing file detail panel; non-previewable types show a fallback message instead of triggering download automatically.",
-    "Video preview should use standard HTML5 progressive playback; ensure the backend download/streaming approach supports efficient incremental fetching for large media (avoid requiring full-file download before playback)."
+    "Video preview should use standard HTML5 progressive playback; ensure the backend download/streaming approach supports efficient incremental fetching for large media (avoid requiring full-file download before playback).",
+    "Caffeine can deploy a live frontend at a stable URL even if the backend canister is missing/stopped; after deploy, confirm and record the real mainnet backend canister ID(s) for monitoring and cycles top-ups (NNS canister linking requires the canister to actually exist on mainnet)."
   ],
   "known_issues": [
     "Mainnet deployment can fail if the cycles wallet/canister is not funded with sufficient cycles (top up via NNS by converting ICP to cycles).",
     "Settings area UI is not scrollable, preventing access to the Admin Paywall Management panel input (cannot enter Principal ID).",
-    "App is stuck on \"Loading Secure Vault\" immediately on open (startup hang / infinite loading state)."
+    "App is stuck on \"Loading Secure Vault\" immediately on open (startup hang / infinite loading state).",
+    "Draft app shows IC0508 Reject code 5 ('canister is stopped') / NNS 'canister not found' for canister ID 34x5e-hyaaa-aaaad-qjcoq-cai, indicating the backend canister may not be deployed/registered on mainnet or is stopped, causing connection errors on startup."
   ],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-implement-user-authentication-using-internet-identity-and-ensure-all-data-operations-are-scoped-to-the-caller-s-internet-computer-principal",
@@ -259,6 +261,30 @@
         "REQ-38"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-update-the-ic-mainnet-deployment-script-frontend-scripts-deploy-ic-sh-to-perform-a-truly-fresh-end-to-end-mainnet-deployment-that-guarantees-the-backend-canister-exists-on-mainnet-create-if-missing-before-attempting-install-upgrade-and-to-fail-with-clear-actionable-errors-when-creation-installation-is-not-possible-e-g-insufficient-cycles-controller-mismatch",
+      "title": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-enhance-the-deploy-script-output-to-always-print-and-log-the-resulting-backend-canister-id-and-frontend-canister-id-after-a-successful-deployment-plus-a-deterministic-set-of-post-deploy-verification-commands-urls-that-confirm-the-backend-canister-is-reachable-on-mainnet",
+      "title": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-complete-and-expand-frontend-deployment-ic-md-so-it-contains-the-full-copy-pastable-mainnet-deployment-steps-including-the-exact-command-to-run-the-deployment-script-plus-a-troubleshooting-section-for-the-specific-canister-not-found-in-nns-and-ic0508-canister-is-stopped-error-scenario-described-in-this-conversation",
+      "title": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -383,6 +409,12 @@
     {
       "id": "AR-18",
       "summary": "For non-previewable file types (e.g., ZIP), show a fallback message on the preview page rather than auto-downloading",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Perform a fresh mainnet backend deployment so the app has a real backend canister, then provide the resulting backend canister ID(s) for monitoring and cycles top-ups",
       "reqIds": [],
       "status": "pending"
     }

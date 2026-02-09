@@ -112,7 +112,7 @@ actor {
 
   public query ({ caller }) func getPaywallStatus(_user : Principal) : async PaywallStatus {
     if (not (AccessControl.isAdmin(accessControlState, caller))) {
-      Runtime.trap("Unauthorized: Only admins can view other users' paywall status");
+      Runtime.trap("Unauthorized: Only admins can view other users` paywall status");
     };
     switch (paywallMap.get(_user)) {
       case (null) {
