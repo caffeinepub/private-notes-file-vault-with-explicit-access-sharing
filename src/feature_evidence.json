@@ -2,9 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-ic-mainnet-deployment-script-frontend-scripts-deploy-ic-sh-to-perform-a-truly-fresh-end-to-end-mainnet-deployment-that-guarantees-the-backend-canister-exists-on-mainnet-create-if-missing-before-attempting-install-upgrade-and-to-fail-with-clear-actionable-errors-when-creation-installation-is-not-possible-e-g-insufficient-cycles-controller-mismatch",
-      "featureTitle": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
+      "featureId": "feature-update-the-mainnet-deployment-script-frontend-scripts-deploy-ic-sh-to-persist-the-resulting-backend-canister-id-and-frontend-canister-id-to-a-stable-machine-readable-artifact-inside-the-repo-e-g-a-json-file-under-frontend-deploy-logs-on-every-successful-deployment-so-the-ids-can-be-retrieved-later-without-needing-console-output",
+      "featureTitle": "Update the mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to persist the resulting **backend canister ID** and **frontend canister ID** to a stable, machine-readable artifact inside the repo (e.g., a JSON file under `frontend/deploy-logs/`) on every successful deployment, so the IDs can be retrieved later without needing console output.",
       "files": [
+        "frontend/deploy-logs/ic-latest.json",
         "frontend/scripts/deploy-ic.sh"
       ],
       "components": [
@@ -17,47 +18,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-39"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-enhance-the-deploy-script-output-to-always-print-and-log-the-resulting-backend-canister-id-and-frontend-canister-id-after-a-successful-deployment-plus-a-deterministic-set-of-post-deploy-verification-commands-urls-that-confirm-the-backend-canister-is-reachable-on-mainnet",
-      "featureTitle": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
-      "files": [
-        "frontend/scripts/deploy-ic.sh"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-40"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-complete-and-expand-frontend-deployment-ic-md-so-it-contains-the-full-copy-pastable-mainnet-deployment-steps-including-the-exact-command-to-run-the-deployment-script-plus-a-troubleshooting-section-for-the-specific-canister-not-found-in-nns-and-ic0508-canister-is-stopped-error-scenario-described-in-this-conversation",
-      "featureTitle": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
-      "files": [
-        "frontend/DEPLOYMENT_IC.md"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-41"
+        "REQ-42"
       ],
       "confidence": "high"
     }

@@ -1,0 +1,9 @@
+{
+  "backendCanisterId": "",
+  "frontendCanisterId": "",
+  "frontendUrl": "",
+  "backendRawUrl": "",
+  "deploymentTimestamp": "",
+  "network": "ic",
+  "_note": "This file will be populated after the first successful mainnet deployment"
+}

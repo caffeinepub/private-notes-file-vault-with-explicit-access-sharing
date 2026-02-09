@@ -1,13 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Make the IC mainnet deployment flow reliably perform a fresh backend/frontend deployment, always output correct canister IDs for `--network ic`, and provide clear post-deploy verification and troubleshooting guidance.
+**Goal:** Make mainnet deployments re-runnable by persisting the resulting backend and frontend canister IDs in a stable, machine-readable file for later retrieval.
 
 **Planned changes:**
-- Update `frontend/scripts/deploy-ic.sh` to perform an end-to-end mainnet deploy that creates required canisters on `--network ic` when missing, then installs/upgrades them, and fails with clear step-specific, actionable errors (e.g., insufficient cycles, controller mismatch).
-- Ensure the deploy script continues writing timestamped logs under `frontend/deploy-logs/`, and includes the failing step name plus captured `dfx` output on failure.
-- Enhance successful deploy output (stdout + log) to always print the backend and frontend canister IDs sourced from `dfx` for `--network ic`, and include a deterministic “Verify” section with post-deploy commands/URLs (e.g., `dfx canister status backend --network ic` and a backend reachability hint).
-- Expand `frontend/DEPLOYMENT_IC.md` with complete copy-pastable mainnet deployment steps (including the exact command to run `frontend/scripts/deploy-ic.sh`), plus guidance to record canister IDs and verify them with `dfx`.
-- Add troubleshooting documentation in `frontend/DEPLOYMENT_IC.md` for (1) NNS “canister not found” when linking an ID and (2) IC0508 “canister is stopped”, including verification steps to distinguish not deployed vs stopped vs wrong network.
+- Update `frontend/scripts/deploy-ic.sh` to write a deterministic artifact file under `frontend/deploy-logs/` on every successful mainnet deployment.
+- Store at minimum: backend canister ID, frontend canister ID, deployment timestamp, and computed frontend URL in the artifact.
+- Keep existing stdout printing of canister IDs, and ensure the artifact mirrors the same values.
+- Add safeguards so that if either canister ID cannot be determined, the script does not overwrite the last-known-good artifact and prints a clear warning with manual retrieval commands (`dfx canister id ... --network ic`).
 
-**User-visible outcome:** Running the mainnet deploy script on a clean setup will create and deploy the canisters (or fail with clear, logged reasons), and users will see the correct mainnet canister IDs plus concrete verification steps/URLs and troubleshooting guidance in the deployment docs.
+**User-visible outcome:** After running `frontend/scripts/deploy-ic.sh`, users can reliably retrieve the most recently deployed mainnet backend/frontend canister IDs (plus timestamp and frontend URL) from a consistent file in `frontend/deploy-logs/` without relying on console output.

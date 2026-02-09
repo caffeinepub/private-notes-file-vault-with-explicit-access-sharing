@@ -1,30 +1,62 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T00:25:09.487Z",
-  "summary": "The diff implements a more robust IC deploy script with preflight/build steps, log file creation under frontend/deploy-logs, and explicit canister-existence checks/creation (at least for the backend, with the remainder truncated). DEPLOYMENT_IC.md is described as expanded to include mainnet steps and troubleshooting. However, substantial unrelated application feature work (paywall/admin functions and many UI feature summaries) appears in the changes despite not being requested.",
-  "missing_requirements": [],
-  "hallucinated_features": [
+  "generatedAt": "2026-02-09T00:41:13.234Z",
+  "summary": "REQ-42 is only partially evidenced: a deterministic artifact path under frontend/deploy-logs/ is added and the deploy script defines artifact file variables, but the diff summary is truncated before showing that the script actually writes the required JSON fields on successful deploy and preserves the last-known-good artifact when IDs cannot be determined. Additionally, many unrelated frontend UI/feature changes and new documentation appear in the diff without being requested by REQ-42.",
+  "missing_requirements": [
     {
-      "description": "Added/modified backend paywall/admin-related types and functions (e.g., PaywallStatus, AdminPaywallStatus, setPaywallStatus, getPaywallStatus, getCallerPaywallStatus, getAllAdminPaywallStates), which are unrelated to mainnet deployment reliability requirements.",
-      "reason": "BuildRequest non-goals explicitly exclude adding new application features unrelated to mainnet deployment reliability; the requested work was limited to the deploy script and deployment documentation.",
+      "id": "REQ-42",
+      "requirement": "After a successful run of frontend/scripts/deploy-ic.sh, write a deterministic, machine-readable artifact under frontend/deploy-logs/ containing at minimum: backend canister ID, frontend canister ID, deployment timestamp, and the computed frontend URL.",
+      "reason": "The diff shows the artifact file path (frontend/deploy-logs/ic-latest.json) and variables in the script, plus a placeholder JSON file with empty values, but the deploy script is truncated before any logic that populates/writes the artifact with real IDs/timestamp/URL is shown.",
       "evidence": [
-        "backend/main.mo"
+        "frontend/deploy-logs/ic-latest.json",
+        "frontend/scripts/deploy-ic.sh (truncated)"
       ]
     },
     {
-      "description": "Large set of unrelated frontend feature work described/rolled up in frontend-file-summaries (new/expanded hooks, components, encryption utilities, UI panels, paywall gating, etc.).",
-      "reason": "BuildRequest only asked for changes to frontend/scripts/deploy-ic.sh and frontend/DEPLOYMENT_IC.md; these application/UI feature changes are not requested.",
+      "id": "REQ-42",
+      "requirement": "The script continues to print the canister IDs to stdout as it currently does, and also writes the same values to the artifact file.",
+      "reason": "The deploy script content is truncated; it is not possible to verify from the provided excerpt that stdout printing behavior remains and that the same values are written into the JSON artifact.",
       "evidence": [
-        "frontend-file-summaries.txt"
+        "frontend/scripts/deploy-ic.sh (truncated)"
+      ]
+    },
+    {
+      "id": "REQ-42",
+      "requirement": "If the script cannot determine either canister ID at the end of deployment, it does not overwrite the last-known-good artifact file and prints a clear warning explaining manual retrieval via `dfx canister id ... --network ic`.",
+      "reason": "No end-of-script ID validation / conditional non-overwrite behavior is visible in the truncated script excerpt, and no warning message text matching the requirement is shown.",
+      "evidence": [
+        "frontend/scripts/deploy-ic.sh (truncated)"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Large set of unrelated frontend UI/UX and feature changes (authentication flow, paywall/admin access list, encryption UI, notes/files panels, sharing dialogs, styling/theme updates).",
+      "reason": "BuildRequest only asks to update the mainnet deployment script to persist canister IDs; it explicitly calls out non-goals about unrelated product features. The diff summary indicates many modified frontend source files unrelated to deployment artifact persistence.",
+      "evidence": [
+        "frontend-file-summaries.txt (truncated)"
+      ]
+    },
+    {
+      "description": "Added/updated extensive mainnet deployment documentation file frontend/DEPLOYMENT_IC.md.",
+      "reason": "Not requested by REQ-42; requirement is specifically to update frontend/scripts/deploy-ic.sh to write a stable artifact. Documentation changes are extra scope.",
+      "evidence": [
+        "frontend-file-summaries.txt (truncated)"
+      ]
+    },
+    {
+      "description": "Added a placeholder artifact file frontend/deploy-logs/ic-latest.json with empty canister IDs and other fields.",
+      "reason": "REQ-42 requires persisting resulting IDs after successful deployments; adding a pre-populated empty template file is not explicitly requested and may be additional/unnecessary behavior (though related).",
+      "evidence": [
+        "frontend/deploy-logs/ic-latest.json"
       ]
     }
   ],
   "confidence": 0.62,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/DEPLOYMENT_IC.md",
+    "frontend/deploy-logs/ic-latest.json",
     "frontend/scripts/deploy-ic.sh",
     "project_state.json"
   ]

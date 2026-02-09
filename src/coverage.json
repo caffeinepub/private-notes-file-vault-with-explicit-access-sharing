@@ -1,57 +1,37 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-09T00:25:09.491Z",
+  "generatedAt": "2026-02-09T00:41:13.237Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-39",
-        "summary": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
+        "id": "REQ-42",
+        "summary": "Update the mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to persist the resulting **backend canister ID** and **frontend canister ID** to a stable, machine-readable artifact inside the repo (e.g., a JSON file under `frontend/deploy-logs/`) on every successful deployment, so the IDs can be retrieved later without needing console output.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/scripts/deploy-ic.sh"
-        ],
-        "matchedFiles": [
-          "frontend/scripts/deploy-ic.sh"
-        ]
-      },
-      {
-        "id": "REQ-40",
-        "summary": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/scripts/deploy-ic.sh"
-        ],
-        "matchedFiles": [
-          "frontend/scripts/deploy-ic.sh"
-        ]
-      },
-      {
-        "id": "REQ-41",
-        "summary": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
-        "status": "implemented",
-        "plannedFiles": [
+          "frontend/scripts/deploy-ic.sh",
+          "frontend/deploy-logs/ic-latest.json",
           "frontend/DEPLOYMENT_IC.md"
         ],
         "matchedFiles": [
-          "frontend/DEPLOYMENT_IC.md"
+          "frontend/scripts/deploy-ic.sh",
+          "frontend/deploy-logs/ic-latest.json"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/DEPLOYMENT_IC.md",
+    "frontend/deploy-logs/ic-latest.json",
     "frontend/scripts/deploy-ic.sh",
     "project_state.json",
     "scratch/component-selection.json",

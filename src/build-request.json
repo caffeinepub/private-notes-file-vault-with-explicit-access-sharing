@@ -1,79 +1,36 @@
 {
   "kind": "build_request",
-  "title": "Fresh IC mainnet backend deployment flow + reliable canister ID output and verification",
-  "priority": "high",
+  "title": "Make mainnet deployments re-runnable and persist resulting canister IDs for retrieval",
+  "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-39",
-      "text": "Update the IC mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to perform a truly fresh, end-to-end mainnet deployment that guarantees the backend canister exists on mainnet (create if missing) before attempting install/upgrade, and to fail with clear actionable errors when creation/installation is not possible (e.g., insufficient cycles, controller mismatch).",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-12",
-          "msg-13"
-        ],
-        "quotes": [
-          "yes lets do a fresh backend deploy",
-          "ready"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Running `frontend/scripts/deploy-ic.sh` on a clean mainnet setup (no canisters created yet) creates required canisters on `--network ic` and then installs them successfully, or exits with a clear error message indicating which step failed (create/build/install) and why.",
-        "The script no longer relies solely on `dfx canister install ...` for first-time deployment; it performs the necessary canister creation step(s) when the canister does not yet exist on mainnet.",
-        "The script continues to write a timestamped log file under `frontend/deploy-logs/` and includes the failing step name and captured `dfx` output on failure."
-      ]
-    },
-    {
-      "id": "REQ-40",
-      "text": "Enhance the deploy script output to always print (and log) the resulting **backend canister ID** and **frontend canister ID** after a successful deployment, plus a deterministic set of post-deploy verification commands/URLs that confirm the backend canister is reachable on mainnet.",
-      "target": "both",
-      "source": {
-        "messageIds": [
-          "msg-10",
-          "msg-12"
-        ],
-        "quotes": [
-          "what is the canister id this has been installed in? I would like to monitor and top up with cycles",
-          "yes lets do a fresh backend deploy"
-        ]
-      },
-      "acceptanceCriteria": [
-        "On success, the script prints and logs: `Backend Canister ID: ...` and `Frontend Canister ID: ...` (as it does today) and additionally prints a short ‘Verify’ section containing at least: `dfx canister status backend --network ic` and a backend reachability hint (e.g., an ic0.app/raw.ic0.app URL pattern) without requiring the user to guess what to check.",
-        "The printed IDs are retrieved from `dfx` in a way that reflects the actual deployed canisters on `--network ic` (not local), and the output is present in the log file as well as stdout."
-      ]
-    },
-    {
-      "id": "REQ-41",
-      "text": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
+      "id": "REQ-42",
+      "text": "Update the mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to persist the resulting **backend canister ID** and **frontend canister ID** to a stable, machine-readable artifact inside the repo (e.g., a JSON file under `frontend/deploy-logs/`) on every successful deployment, so the IDs can be retrieved later without needing console output.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-7",
-          "msg-12"
+          "msg-1"
         ],
         "quotes": [
-          "when I link it - it says Sorry, the canister \"34x5e-hyaaa-aaaad-qjcoq-cai\" was not found",
-          "Reject text: Canister 34x5e-hyaaa-aaaad-qjcoq-cai is stopped",
-          "yes lets do a fresh backend deploy"
+          "ok pls trigger another deployment"
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/DEPLOYMENT_IC.md` includes the exact command(s) to run from the project root to deploy to `--network ic` (including invoking `frontend/scripts/deploy-ic.sh`).",
-        "The guide documents how to obtain and record the backend and frontend canister IDs after deployment, and how to verify them using `dfx` commands.",
-        "The troubleshooting section explicitly addresses: (1) NNS ‘canister not found’ when linking an ID, and (2) IC0508 ‘canister is stopped’ errors in the app, and provides concrete verification steps to distinguish ‘not deployed’, ‘stopped’, and ‘wrong network’ cases."
+        "After a successful run of `frontend/scripts/deploy-ic.sh`, a deterministic file (same path on every run) exists under `frontend/deploy-logs/` containing at minimum: backend canister ID, frontend canister ID, deployment timestamp, and the computed frontend URL.",
+        "The script continues to print the canister IDs to stdout as it currently does, and also writes the same values to the artifact file.",
+        "If the script cannot determine either canister ID at the end of deployment, it does not overwrite the last-known-good artifact file and prints a clear warning explaining how to retrieve IDs manually (`dfx canister id ... --network ic`)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor with all logic in `backend/main.mo`; only add `backend/migration.mo` if a state upgrade requires it.",
-    "Do not modify any paths listed under `frontend.immutablePaths` in SYSTEM_CONTEXT (compose new code instead).",
-    "Use English for any user-facing text."
+    "Do not modify any frontend immutable paths listed in SYSTEM_CONTEXT.",
+    "Do not introduce any external services or CI/CD dependencies; the deployment flow must remain runnable via local `dfx`.",
+    "Keep all backend logic within the existing single Motoko actor (no new backend canisters/services)."
   ],
   "nonGoals": [
-    "Implementing NNS UI changes or any third-party monitoring integration for cycles.",
-    "Adding new application features unrelated to mainnet deployment reliability (e.g., new vault functionality, new paywall rules).",
-    "Guaranteeing canister appearance in NNS without manual linking (NNS behavior is outside app control)."
+    "Building an in-app UI to trigger deployments from the browser.",
+    "Automatically deploying from within Caffeine/Chat (this build request only changes project code/scripts).",
+    "Changing backend data models or adding new product features unrelated to deployment ID retrieval."
   ],
   "imageRequirements": {
     "required": [],

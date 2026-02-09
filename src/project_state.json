@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 21,
+  "projectStateVersion": 23,
   "summary": "Build a private, secure notes/files app with explicit sharing, plus a paywall/monetization layer so only paid users can store/upload content (the canister still pays cycles under the reverse-gas model).",
   "architectural_notes": [
     "Use strong encryption and explicit access control/permissions so only authorized users can access uploaded notes/files.",
@@ -283,6 +283,14 @@
       "title": "Complete and expand `frontend/DEPLOYMENT_IC.md` so it contains the full, copy-pastable mainnet deployment steps (including the exact command to run the deployment script), plus a troubleshooting section for the specific ‘canister not found in NNS’ and IC0508 ‘canister is stopped’ error scenario described in this conversation.",
       "reqIds": [
         "REQ-41"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-mainnet-deployment-script-frontend-scripts-deploy-ic-sh-to-persist-the-resulting-backend-canister-id-and-frontend-canister-id-to-a-stable-machine-readable-artifact-inside-the-repo-e-g-a-json-file-under-frontend-deploy-logs-on-every-successful-deployment-so-the-ids-can-be-retrieved-later-without-needing-console-output",
+      "title": "Update the mainnet deployment script (`frontend/scripts/deploy-ic.sh`) to persist the resulting **backend canister ID** and **frontend canister ID** to a stable, machine-readable artifact inside the repo (e.g., a JSON file under `frontend/deploy-logs/`) on every successful deployment, so the IDs can be retrieved later without needing console output.",
+      "reqIds": [
+        "REQ-42"
       ],
       "version": 1
     }

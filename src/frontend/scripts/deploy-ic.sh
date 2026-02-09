@@ -20,6 +20,10 @@ mkdir -p "$LOGS_DIR"
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 LOG_FILE="$LOGS_DIR/deploy-$TIMESTAMP.log"
 
+# Deterministic artifact file path
+ARTIFACT_FILE="$LOGS_DIR/ic-latest.json"
+ARTIFACT_TEMP="$LOGS_DIR/ic-latest.json.tmp"
+
 echo -e "🚀 Starting IC mainnet deployment..."
 echo -e "📝 Logging to: $LOG_FILE"
 echo ""
@@ -197,12 +201,41 @@ FRONTEND_ID=$(dfx canister id frontend --network ic 2>&1)
 if [ -z "$BACKEND_ID" ] || [ -z "$FRONTEND_ID" ]; then
     log_and_display "${YELLOW}⚠️  Warning: Could not extract canister IDs${NC}"
     log_and_display "Deployment may have succeeded, but canister IDs are not available."
-    log_and_display "Check with: dfx canister id backend --network ic"
+    log_and_display ""
+    log_and_display "To retrieve canister IDs manually, run:"
+    log_and_display "  dfx canister id backend --network ic"
+    log_and_display "  dfx canister id frontend --network ic"
+    log_and_display ""
+    log_and_display "⚠️  Deployment artifact NOT updated (last-known-good preserved)"
     exit 0
 fi
 
 FRONTEND_URL="https://$FRONTEND_ID.ic0.app"
 BACKEND_RAW_URL="https://$BACKEND_ID.raw.ic0.app"
+
+# Write deployment artifact to deterministic location
+log_and_display ""
+log_and_display "${BLUE}💾 Writing deployment artifact...${NC}"
+
+# Generate ISO-8601 timestamp
+DEPLOY_TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# Write to temp file first (atomic write pattern)
+cat > "$ARTIFACT_TEMP" <<EOF
+{
+  "backendCanisterId": "$BACKEND_ID",
+  "frontendCanisterId": "$FRONTEND_ID",
+  "frontendUrl": "$FRONTEND_URL",
+  "backendRawUrl": "$BACKEND_RAW_URL",
+  "deploymentTimestamp": "$DEPLOY_TIMESTAMP",
+  "network": "ic"
+}
+EOF
+
+# Atomically move temp file to final location
+mv "$ARTIFACT_TEMP" "$ARTIFACT_FILE"
+
+log_and_display "${GREEN}✓ Deployment artifact written to: $ARTIFACT_FILE${NC}"
 
 # Success output
 log_and_display ""
@@ -244,6 +277,8 @@ log_and_display "   - Go to https://nns.ic0.app"
 log_and_display "   - Navigate to Canisters → Link Canister"
 log_and_display "   - Paste backend ID: $BACKEND_ID"
 log_and_display "   - Paste frontend ID: $FRONTEND_ID"
+log_and_display ""
+log_and_display "📄 Deployment metadata saved to: $ARTIFACT_FILE"
 log_and_display ""
 log_and_display "$(date): Deployment completed successfully"
 
